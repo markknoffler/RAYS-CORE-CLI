@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.dylib
+*.dll
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# Runtime and local state
+.rays/
+*.log
+
+# Secrets and local config
+.env
+.env.*
+*.pem
+*.key
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+
+# OS/IDE
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,214 @@
+# RAYS-CORE
+
+RAYS-CORE is an AI coding assistant for local repositories. It indexes your codebase, retrieves relevant symbols and files, plans changes, applies edits with permission controls, and maintains persistent project memory.
+
+## Why RAYS-CORE
+
+- Works on real codebases with structural indexing and symbol-level retrieval.
+- Supports read-only chat, targeted editing, and new-project generation in one CLI.
+- Provider-flexible: local-first with Ollama, plus Gemini API support.
+- Tracks context over time through `.rays` memory and summaries.
+
+## Features
+
+- Codebase indexing (`files`, `symbols`, `relationships`, `boundaries`) via msgpack registries.
+- ChromaDB-backed vector retrieval for relevant chunks.
+- Multi-stage edit pipeline: task analysis -> selection -> planning -> permissions -> apply.
+- Interactive slash commands (`/chat`, `/model`, `/mode`, `/git`, `/help`).
+- Session-aware API key handling (reads env vars first; never persists keys in `config.yaml`).
+
+## Supported Providers
+
+- **Ollama (local)**
+  - Default local endpoint: `http://localhost:11434`
+  - By default, RAYS expects Ollama to be running on port `11434` unless you configure a different endpoint.
+- **Gemini API**
+  - Uses `GEMINI_API_KEY` (or fallback `GOOGLE_API_KEY`).
+
+Some builds may still show additional provider options in the selector, but this repository release is documented and supported around Ollama and Gemini.
+
+## Environment Variables
+
+RAYS checks environment variables before prompting for API keys.
+
+- `GEMINI_API_KEY`: Gemini API key (preferred for Gemini)
+- `GOOGLE_API_KEY`: Gemini fallback key if `GEMINI_API_KEY` is not set
+
+### macOS/Linux (zsh/bash)
+
+```bash
+export GEMINI_API_KEY="your_gemini_key"
+```
+
+To make permanent in zsh:
+
+```bash
+echo 'export GEMINI_API_KEY="your_gemini_key"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+### Windows (PowerShell)
+
+```powershell
+setx GEMINI_API_KEY "your_gemini_key"
+```
+
+Open a new terminal after `setx`.
+
+## Installation
+
+### Option A: pipx (recommended for CLI users)
+
+```bash
+pipx install rays-core
+```
+
+### Option B: pip
+
+```bash
+pip install rays-core
+```
+
+### Development install from source
+
+```bash
+git clone https://github.com/<your-username>/RAYS-CORE.git
+cd RAYS-CORE
+python -m pip install -e .
+```
+
+## Quick Start
+
+```bash
+rays /path/to/your/codebase
+```
+
+Or inside a repository:
+
+```bash
+cd /path/to/your/codebase
+rays
+```
+
+## The 3 Operating Modes
+
+RAYS-CORE supports three workflow modes in practice:
+
+1. **Editing mode (default pipeline)**
+   - Trigger: normal prompt without `/chat`.
+   - Behavior: analyzes task, identifies symbols/files, negotiates permissions, plans edits, applies changes.
+
+2. **New codebase generation mode**
+   - Trigger: prompts that clearly request creating a new project and low structural dependency on existing code.
+   - Behavior: sets up project structure, negotiates creation scope, generates files iteratively.
+
+3. **Chat mode (`/chat`)**
+   - Trigger: `/chat <question>`.
+   - Behavior: read-only contextual Q&A; no edit pipeline.
+
+## Prompting Guide
+
+### Editing mode prompts (normal chat input)
+
+- "Refactor authentication middleware to support JWT refresh tokens."
+- "Fix the bug where user profile update fails on missing avatar."
+- "Add caching around `get_project_metrics` and include invalidation."
+
+### New codebase creation prompts
+
+- "Create a new FastAPI project with JWT auth, PostgreSQL, and Alembic migrations."
+- "Generate a minimal React + TypeScript dashboard app with routing and auth pages."
+
+### Chat mode prompts
+
+Use:
+
+```text
+/chat how does the permission negotiation pipeline work in this repo?
+```
+
+## Slash Commands
+
+- `/help` - show commands
+- `/chat <question>` - read-only contextual Q&A
+- `/model <name>` - switch model
+- `/mode auto` - autonomous command execution
+- `/mode ask` - ask-permission command execution
+- `/git` - summarize current git changes
+- `/clear` - clear screen
+- `/exit` - exit RAYS
+
+## Execution Behavior (`/mode`)
+
+- **Ask mode**: requests confirmation for terminal actions.
+- **Autonomous mode**: executes without per-command confirmation.
+
+## Pipeline Architecture
+
+1. **Provider + model selection**
+2. **Indexing** of files/symbols/relationships/boundaries
+3. **Vector DB sync** for semantic retrieval
+4. **Task analysis** (intent, scope, terminal needs)
+5. **Symbol detection** and candidate retrieval
+6. **Planning** and permission negotiation
+7. **Anchoring + code generation**
+8. **Execution** and post-edit terminal actions
+9. **Memory + summary persistence**
+
+Core modules:
+
+- `rays_main.py` - orchestrator and CLI loop
+- `task_analyzer.py` - intent and scope analysis
+- `symbol_detection.py` - symbol selection and retrieval
+- `planning.py` - implementation planning
+- `execution.py` + `code_generator.py` - code application
+- `memory.py` - persistent memory and summaries
+
+## Configuration
+
+Primary configuration file: `config.yaml`
+
+Key sections:
+
+- `llm` - provider, model, endpoint, runtime key override
+- `embedding` - embedding provider/model/endpoint
+- `execution_mode` - default `ask` or `autonomous`
+
+`config.yaml` values are startup defaults. During CLI startup, selected provider/model values are updated and persisted automatically.
+
+RAYS intentionally clears persisted API keys in config and uses runtime/session keys.
+
+## Contributing
+
+Contributions are welcome. Start with `CONTRIBUTING.md` for setup, branch hygiene, PR expectations, and review checklist.
+
+## Security
+
+If you discover a security issue, see `SECURITY.md` for reporting guidance.
+
+## License
+
+MIT License. See `LICENSE`.
+
+## Publishing Notes (Maintainers)
+
+### Build package
+
+```bash
+python -m pip install --upgrade build twine
+python -m build
+twine check dist/*
+```
+
+### Publish to PyPI
+
+```bash
+python -m twine upload dist/*
+```
+
+### Recommended install command for users
+
+```bash
+pipx install rays-core
+```
+

@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rays-core"
+version = "1.0.0"
+description = "RAYS-CORE: AI-powered codebase analysis and editing assistant"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "Samreedh Bhuyan" }
+]
+dependencies = [
+  "chromadb",
+  "msgpack",
+  "pyyaml",
+  "requests",
+  "rich",
+  "tree-sitter"
+]
+keywords = ["ai", "codebase", "developer-tools", "cli", "agent"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Operating System :: OS Independent",
+  "Topic :: Software Development :: Code Generators",
+  "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+[project.scripts]
+rays = "rays_main:main"
+
+[project.urls]
+Homepage = "https://github.com/<your-username>/RAYS-CORE"
+Repository = "https://github.com/<your-username>/RAYS-CORE"
+Issues = "https://github.com/<your-username>/RAYS-CORE/issues"
