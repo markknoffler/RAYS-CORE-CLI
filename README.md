@@ -1,6 +1,6 @@
-# RAYS-CORE
-
 <p align="center">
+  <strong><img width="305" height="101" alt="Screenshot 2026-04-25 at 4 22 11 PM" src="https://github.com/user-attachments/assets/47a81199-ad05-49fc-8df0-2918508dac34" />
+</strong><br/>
   <strong>Open-source AI coding assistant for real repositories.</strong><br/>
   Index. Analyze. Plan. Edit. Ship.
 </p>
@@ -17,20 +17,12 @@
 
 ## Preview
 
-> Add your hero screenshot/GIF below (the big one at the top like the OpenCode page):
+<img width="1469" height="872" alt="Screenshot 2026-04-25 at 4 17 25 PM" src="https://github.com/user-attachments/assets/481788ed-20d8-45ba-bce6-459ade35b960" />
 
-```md
-![RAYS-CORE Hero](docs/images/rays-hero.png)
-```
 
-Example layout with short supporting text:
 
-```md
-<p align="center">
-  <img src="docs/images/rays-hero.png" alt="RAYS-CORE hero screenshot" width="95%" />
-</p>
-<p align="center"><em>RAYS-CORE in action: contextual planning and edits inside a real codebase.</em></p>
-```
+<img width="1469" height="872" alt="Screenshot 2026-04-25 at 4 18 46 PM" src="https://github.com/user-attachments/assets/869fda6c-5a07-4d8b-ab16-d44b1b0b0400" />
+
 
 RAYS-CORE is an AI coding assistant for local repositories. It indexes your codebase, retrieves relevant symbols and files, plans changes, applies edits with permission controls, and maintains persistent project memory.
 
