@@ -2,10 +2,10 @@ from setuptools import setup
 
 setup(
     name="rays-core",
-    version="1.0.0",
+    version="1.5.2",
     description="RAYS-CORE — AI-Powered Development Assistant",
     author="Samreedh Bhuyan",
-    url="https://github.com/<your-username>/RAYS-CORE",
+    url="https://github.com/markknoffler/RAYS-CORE-CLI",
     py_modules=[
         "rays_main",
         "rays_ui",
@@ -31,6 +31,7 @@ setup(
         "chat_context_pipeline",
         "git_status_summarizer",
         "affected_symbols_skeleton_fill",
+        "config_locator",
     ],
     install_requires=[
         "rich",
@@ -45,5 +46,6 @@ setup(
             "rays=rays_main:main",
         ],
     },
+    data_files=[("", ["config.yaml"])],
     python_requires=">=3.10",
 )

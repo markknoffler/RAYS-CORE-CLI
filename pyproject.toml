@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rays-core"
-version = "1.0.0"
+version = "1.5.2"
 description = "RAYS-CORE: AI-powered codebase analysis and editing assistant"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -38,6 +38,6 @@ classifiers = [
 rays = "rays_main:main"
 
 [project.urls]
-Homepage = "https://github.com/<your-username>/RAYS-CORE"
-Repository = "https://github.com/<your-username>/RAYS-CORE"
-Issues = "https://github.com/<your-username>/RAYS-CORE/issues"
+Homepage = "https://github.com/markknoffler/RAYS-CORE-CLI"
+Repository = "https://github.com/markknoffler/RAYS-CORE-CLI"
+Issues = "https://github.com/markknoffler/RAYS-CORE-CLI/issues"

@@ -72,8 +72,8 @@ pip install rays-core
 ### Development install from source
 
 ```bash
-git clone https://github.com/<your-username>/RAYS-CORE.git
-cd RAYS-CORE
+git clone https://github.com/markknoffler/RAYS-CORE-CLI.git
+cd RAYS-CORE-CLI
 python -m pip install -e .
 ```
 

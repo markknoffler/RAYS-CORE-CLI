@@ -267,7 +267,7 @@ def display_banner():
         _create_line(f"{C_PINK}╚═╝  ╚═╝ {C_LAVENDER}╚═╝  ╚═╝    {C_LILAC}╚═╝    {C_MID}╚══════╝"),
         gap,
         _create_line(f"{C_LAVENDER}Vivid Shapes Development Assistant"),
-        _create_line(f"{C_LILAC}github.com/samreedhk/RAYS"),
+        _create_line(f"{C_LILAC}github.com/markknoffler/RAYS-CORE-CLI"),
         gap,
         ftr,
     ]

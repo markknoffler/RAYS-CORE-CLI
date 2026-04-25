@@ -34,6 +34,7 @@ from new_codebase_generator import NewCodebaseGenerator
 from git_status_summarizer import GitStatusSummarizer
 from affected_symbols_skeleton_fill import AffectedSymbolsSkeletonFiller
 from chat_context_pipeline import ChatContextPipeline
+from config_locator import resolve_config_path
 
 class RAYS:
     def __init__(
@@ -130,12 +131,7 @@ class RAYS:
     
     def _load_config(self, path: str) -> Dict[str, Any]:
         """Load configuration from YAML file"""
-        config_path = Path(path)
-        if not config_path.exists():
-            config_path = Path(__file__).parent / "config.yaml"
-        
-        if not config_path.exists():
-            raise FileNotFoundError("config.yaml not found!")
+        config_path = resolve_config_path(path)
         
         with open(config_path) as f:
             return yaml.safe_load(f)
@@ -718,11 +714,7 @@ def main():
         sys.exit(1)
     
     # Resolve config path — look relative to RAYS install dir
-    if args.config:
-        config_path = args.config
-    else:
-        script_dir = Path(__file__).parent.resolve()
-        config_path = str(script_dir / "config.yaml")
+    config_path = str(resolve_config_path(args.config))
     
     rays_dir = codebase_path / ".rays"
     

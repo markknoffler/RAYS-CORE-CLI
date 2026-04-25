@@ -2,6 +2,13 @@
 
 All notable changes to RAYS-CORE will be documented in this file.
 
+## [1.5.2] - 2026-04-25
+
+### Changed
+- Confirmed all public repository links point to `https://github.com/markknoffler/RAYS-CORE-CLI`.
+- Updated package version to `1.5.2` in `pyproject.toml` and `setup.py`.
+- Fixed README clone flow to `cd RAYS-CORE-CLI`.
+
 ## [1.0.0] - 2026-04-24
 
 ### Added
