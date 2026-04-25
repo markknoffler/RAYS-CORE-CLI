@@ -126,42 +126,6 @@ cd /path/to/your/codebase
 rays
 ```
 
-## Screenshots / Demo Gallery
-
-Create a folder for README assets:
-
-```text
-docs/images/
-```
-
-Then add your screenshots and reference them like this:
-
-```md
-## Screenshots
-
-### 1) Planning + analysis flow
-![RAYS planning flow](docs/images/rays-planning.png)
-
-### 2) Code edit execution flow
-![RAYS edit flow](docs/images/rays-editing.png)
-```
-
-If you want side-by-side images:
-
-```md
-<p align="center">
-  <img src="docs/images/rays-planning.png" alt="RAYS planning" width="49%" />
-  <img src="docs/images/rays-editing.png" alt="RAYS editing" width="49%" />
-</p>
-```
-
-Recommended filenames:
-
-- `docs/images/rays-hero.png`
-- `docs/images/rays-planning.png`
-- `docs/images/rays-editing.png`
-- `docs/images/rays-chat.png`
-
 ## The 3 Operating Modes
 
 RAYS-CORE supports three workflow modes in practice:
