@@ -1,5 +1,37 @@
 # RAYS-CORE
 
+<p align="center">
+  <strong>Open-source AI coding assistant for real repositories.</strong><br/>
+  Index. Analyze. Plan. Edit. Ship.
+</p>
+
+<p align="center">
+  <a href="https://github.com/markknoffler/RAYS-CORE-CLI/actions"><img alt="build" src="https://img.shields.io/github/actions/workflow/status/markknoffler/RAYS-CORE-CLI/ci.yml?branch=main&label=build"></a>
+  <a href="https://pypi.org/project/rays-core/"><img alt="pypi" src="https://img.shields.io/pypi/v/rays-core"></a>
+  <a href="https://pypi.org/project/rays-core/"><img alt="python" src="https://img.shields.io/pypi/pyversions/rays-core"></a>
+  <a href="https://pypi.org/project/rays-core/"><img alt="downloads" src="https://img.shields.io/pypi/dm/rays-core"></a>
+  <a href="./LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-green"></a>
+</p>
+
+---
+
+## Preview
+
+> Add your hero screenshot/GIF below (the big one at the top like the OpenCode page):
+
+```md
+![RAYS-CORE Hero](docs/images/rays-hero.png)
+```
+
+Example layout with short supporting text:
+
+```md
+<p align="center">
+  <img src="docs/images/rays-hero.png" alt="RAYS-CORE hero screenshot" width="95%" />
+</p>
+<p align="center"><em>RAYS-CORE in action: contextual planning and edits inside a real codebase.</em></p>
+```
+
 RAYS-CORE is an AI coding assistant for local repositories. It indexes your codebase, retrieves relevant symbols and files, plans changes, applies edits with permission controls, and maintains persistent project memory.
 
 ## Why RAYS-CORE
@@ -63,10 +95,22 @@ Open a new terminal after `setx`.
 pipx install rays-core
 ```
 
+Upgrade later with:
+
+```bash
+pipx upgrade rays-core
+```
+
 ### Option B: pip
 
 ```bash
 pip install rays-core
+```
+
+Upgrade later with:
+
+```bash
+pip install --upgrade rays-core
 ```
 
 ### Development install from source
@@ -89,6 +133,42 @@ Or inside a repository:
 cd /path/to/your/codebase
 rays
 ```
+
+## Screenshots / Demo Gallery
+
+Create a folder for README assets:
+
+```text
+docs/images/
+```
+
+Then add your screenshots and reference them like this:
+
+```md
+## Screenshots
+
+### 1) Planning + analysis flow
+![RAYS planning flow](docs/images/rays-planning.png)
+
+### 2) Code edit execution flow
+![RAYS edit flow](docs/images/rays-editing.png)
+```
+
+If you want side-by-side images:
+
+```md
+<p align="center">
+  <img src="docs/images/rays-planning.png" alt="RAYS planning" width="49%" />
+  <img src="docs/images/rays-editing.png" alt="RAYS editing" width="49%" />
+</p>
+```
+
+Recommended filenames:
+
+- `docs/images/rays-hero.png`
+- `docs/images/rays-planning.png`
+- `docs/images/rays-editing.png`
+- `docs/images/rays-chat.png`
 
 ## The 3 Operating Modes
 
@@ -211,4 +291,8 @@ python -m twine upload dist/*
 ```bash
 pipx install rays-core
 ```
+
+Published package:
+
+- [rays-core on PyPI](https://pypi.org/project/rays-core/)
 
