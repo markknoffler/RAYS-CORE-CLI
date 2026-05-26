@@ -1,0 +1,19 @@
+name: Feature request
+description: Idea for improvement or new capability
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or gap
+      description: What pain point does this solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: How should it behave? Optional mocks / examples.
+    validations:
+      required: true

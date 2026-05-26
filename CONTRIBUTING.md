@@ -12,8 +12,11 @@ Thanks for contributing. This guide keeps changes reviewable, safe, and reproduc
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
 python -m pip install -U pip
-python -m pip install -e .
+python -m pip install -e ".[dev]"
+python -m pytest tests/ -q
 ```
+
+Opening a PR runs **GitHub Actions** on **Ubuntu, macOS, and Windows** (standard Python smoke: install package, pytest, build + `twine check`). Workflow file: `.github/workflows/ci.yml`.
 
 ## Branching and PRs
 
@@ -52,8 +55,9 @@ For feature changes, update relevant docs:
 
 Before opening PR:
 
-- Run local install in editable mode.
-- Start `rays` and verify startup flow.
+- Run `python -m pytest tests/ -q` (smoke imports, bytecode compile, config locator).
+- Run local install in editable mode (`pip install -e ".[dev]"`).
+- Optionally start `rays` and verify startup flow interactively.
 - Validate at least one provider path (Ollama or Gemini).
 - Verify `/chat`, `/mode`, and one edit pipeline prompt.
 

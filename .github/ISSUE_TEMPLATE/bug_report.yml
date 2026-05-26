@@ -1,0 +1,41 @@
+name: Bug report
+description: Something is broken or unexpected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for filing. Please omit API keys / secrets.
+
+  - type: input
+    id: version
+    attributes:
+      label: rays-core version
+      placeholder: e.g. 1.5.4 (from pip / PyPI)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: What happened?
+      description: Steps to reproduce, expected vs actual.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / traceback
+      render: shell
