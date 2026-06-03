@@ -706,6 +706,132 @@ prompts:
     it break?"
 
     '
+skills_orchestrator_prompts:
+  check_completion: "You are a completion validator. Determine if the user's original\
+    \ requirements have been fully satisfied by the executed skills.\n\n**USER PROMPT:**\n\
+    \"{user_prompt}\"\n\n**EXECUTION SUMMARY:**\n{execution_history}\n\n**TASK:**\n\
+    Decide if the task is complete or if further planning/execution is needed.\n\n\
+    **RESPOND WITH JSON:**\n{{\n  \"is_complete\": <true|false>,\n  \"reasoning\"\
+    : \"Explanation of whether all requirements are met.\"\n}}\n"
+  execute_skill_step: |
+    You are a specialized sub-agent executing a specific skill.
+    
+    **USER PROMPT:**
+    "{user_prompt}"
+    
+    **OVERALL PLAN:**
+    {overall_plan}
+    
+    **CURRENT SKILL:**
+    {skill_name}
+    
+    **WORKSPACE ROOT (USER'S CURRENT DIRECTORY):**
+    "{workspace_root}"
+    
+    **SKILL ROOT (ABSOLUTE PATH TO RESOURCES):**
+    "{skill_root}"
+    
+    **WHY THIS SKILL IS USED NOW:**
+    {reason}
+    
+    **SKILL DEFINITION (SKILL.md):**
+    {skill_md}
+    
+    **PREVIOUS SKILL RESULTS (CONTEXT FROM PREVIOUS STEPS):**
+    {previous_results}
+    
+    **CURRENT SKILL EXECUTION HISTORY (TOOL CALLS IN THIS STEP):**
+    {local_history}
+    
+    **YOUR TASK:**
+    Determine the next step to execute this skill.
+    
+    **AVAILABLE TOOLS:**
+    1. `run_shell_command(command)`: Execute bash commands. All commands run with CWD = "{workspace_root}".
+    2. `write_file(path, content)`: Create new files relative to "{workspace_root}".
+    3. `patch_file(path, search, replace)`: Edit existing files relative to "{workspace_root}".
+    4. `read_file(path)`: Read files relative to "{workspace_root}".
+    5. `list_directory(path)`: List files relative to "{workspace_root}".
+    
+    **CRITICAL RULES:**
+    1. **DO NOT \`cd\`**: Your tools automatically run in the WORKSPACE ROOT ("{workspace_root}"). Do NOT use \`cd\` in your commands.
+    2. **USE SKILL RESOURCES**: To use bundled scripts or templates, reference them by their absolute path: "{skill_root}/<file>".
+    3. **OUTPUT LOCATION**: All output files (documents, code, logs) MUST be created in the WORKSPACE ROOT ("{workspace_root}") or its subdirectories.
+    4. **WORKSPACE FIRST**: If the user asks for actions in the "current working directory", they mean the WORKSPACE ROOT.
+    5. **SUMMARY**: When the task is complete, provide a summary of the files created/modified in the WORKSPACE ROOT.
+    
+    **RESPOND WITH JSON:**
+    {{
+      "tool_call": {{
+        "name": "<run_shell_command|write_file|patch_file|read_file|list_directory>",
+        "arguments": {{ ... }}
+      }},
+      "thought": "Your reasoning, referencing WORKSPACE ROOT, SKILL ROOT, and PREVIOUS RESULTS as needed.",
+      "status": "<running|completed>",
+      "summary": "Mandatory if status is completed. This summary will be passed to the next skill in the plan."
+    }}
+  select_required_skills: |
+    You are a skills selection agent. Your task is to identify ALL available skills required to fulfill the user's prompt.
+    
+    **USER PROMPT:**
+    "{user_prompt}"
+    
+    **AVAILABLE SKILLS:**
+    {skills_list}
+    
+    **PREVIOUS EXECUTION HISTORY:**
+    {execution_history}
+    
+    **TASK:**
+    Return a JSON list of skill names that are absolutely necessary to fulfill the request. 
+    If the task involves local files AND creating a document, you MUST select BOTH 'workspace' and the specialized skill (e.g., 'docx').
+    Only return an empty list if the task is 100% complete according to the history.
+    
+    **RESPOND WITH JSON:**
+    {{
+      "required_skills": ["workspace", "docx"],
+      "reasoning": "I need workspace to map the directory and docx to actually create the file."
+    }}
+
+  generate_execution_plan: |
+    You are a skills execution planner. Your task is to create a sequential, multi-step plan to fulfill the user's prompt.
+    
+    **USER PROMPT:**
+    "{user_prompt}"
+    
+    **SELECTED SKILLS:**
+    {required_skills}
+    
+    **PREVIOUS EXECUTION HISTORY:**
+    {execution_history}
+    
+    **TASK:**
+    Generate a COMPLETE sequence of steps. Do NOT plan only one step if multiple are needed.
+    
+    **STRATEGY:**
+    1. **Multi-Step Chain**: If you have 'workspace' and 'docx', your plan MUST have at least 2 steps:
+       - Step 1: workspace (to gather context/paths)
+       - Step 2: docx (to perform the generation using context from Step 1)
+    2. **Context Awareness**: If the history shows 'workspace' already ran and found the path, you can skip it and plan the next specialized skill.
+    3. **Finality**: Ensure the last step in your plan actually delivers the user's request (e.g., creates the file).
+    
+    **RESPOND WITH JSON:**
+    {{
+      "plan": [
+        {{
+          "step": 1,
+          "skill": "workspace",
+          "reason": "Map the directory and read existing markdown content."
+        }},
+        {{
+          "step": 2,
+          "skill": "docx",
+          "reason": "Generate the docx file in the mapped directory using the gathered content."
+        }}
+      ],
+      "total_steps": 2,
+      "summary": "First mapping the workspace, then generating the document."
+    }}
 symbol_detection_prompts:
   explicit_mentions_extraction: "Analyze this user prompt and extract ALL explicit\
     \ mentions of files, symbols, lines, and creation requests.\n\nUser Prompt: \"\

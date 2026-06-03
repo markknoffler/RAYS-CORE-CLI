@@ -572,7 +572,7 @@ def print_info(message: str):
 #                          BOXES
 # ═══════════════════════════════════════════════════════════════════════
 
-def print_box(title: str, content: str, color: str = C_VIOLET, max_lines: int = 15):
+def print_box(title: str, content: str, color: str = C_VIOLET, max_lines: int = 15, content_color: str = C_CREAM):
     """Print a styled box with precision alignment."""
     lines = content.split('\n')
     truncated = len(lines) > max_lines
@@ -589,9 +589,9 @@ def print_box(title: str, content: str, color: str = C_VIOLET, max_lines: int = 
     
     for line in display_lines:
         visible = line[:max(1, inner - 4)] # Leave room for internal padding
-        content = f"  {visible}"
-        pad = max(0, inner - _vis_len(content))
-        capture_print(f"  {color}│{RESET}{C_GRAY}{content}{' ' * pad}{color}│{RESET}\n")
+        content_line = f"  {visible}"
+        pad = max(0, inner - _vis_len(content_line))
+        capture_print(f"  {color}│{RESET}{content_color}{content_line}{' ' * pad}{color}│{RESET}\n")
     
     if truncated:
         msg = f"  … +{len(lines) - max_lines} more lines"
@@ -1038,6 +1038,7 @@ def print_help():
     commands = [
         ("/help",          "Show this help message"),
         ("/exit",          "Exit RAYS"),
+        ("/code <prompt>", "Execute coding pipeline (edit, create, etc.)"),
         ("/model <name>",  "Switch to a different model"),
         ("/chat <prompt>", "Read-only contextual Q&A (no edit pipeline)"),
         ("/mode auto",     "Switch to autonomous execution (no confirmations)"),

@@ -32,6 +32,7 @@ from .git_status_summarizer import GitStatusSummarizer
 from .affected_symbols_skeleton_fill import AffectedSymbolsSkeletonFiller
 from .chat_context_pipeline import ChatContextPipeline
 from .config_locator import resolve_config_path
+from .skills_orchestrator import SkillsOrchestrator
 
 class RAYS:
     def __init__(
@@ -112,6 +113,7 @@ class RAYS:
             executor=self.executor,
             execution_mode=self.execution_mode
         )
+        self.skills_orchestrator = SkillsOrchestrator(self.ai_client, self.config, self.codebase_root)
 
         # Initialize CLI history
         rays_ui.setup_history(str(self.rays_dir))
@@ -932,6 +934,19 @@ def main():
                         rays_ui.display_banner()
                         continue
                     
+                    elif cmd == '/code':
+                        if not cmd_arg.strip():
+                            rays_ui.print_warning("Usage: /code <your coding request>")
+                            continue
+                        results = rays.run(
+                            user_prompt=cmd_arg.strip(),
+                            force_reindex=args.reindex if first_run else False,
+                            force_rebuild_db=args.rebuild_db if first_run else False
+                        )
+                        first_run = False
+                        _save_results(results, cmd_arg.strip(), rays_dir)
+                        continue
+                    
                     elif cmd == '/git':
                         summarizer = GitStatusSummarizer(rays.codebase_root, rays.ai_client, rays.config)
                         summary = summarizer.summarize()
@@ -943,15 +958,8 @@ def main():
                         continue
                 
                 # ── Run the pipeline ────────────────────────────
-                results = rays.run(
-                    user_prompt=user_input,
-                    force_reindex=args.reindex if first_run else False,
-                    force_rebuild_db=args.rebuild_db if first_run else False
-                )
+                rays.skills_orchestrator.run(user_prompt=user_input)
                 first_run = False
-                
-                # Results are already printed inside rays.run
-                _save_results(results, user_input, rays_dir)
                 
             except KeyboardInterrupt:
                 print(f"\n  {rays_ui.C_LAVENDER}Interrupted — returning to prompt{rays_ui.RESET}")
