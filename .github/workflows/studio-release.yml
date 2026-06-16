@@ -1,0 +1,52 @@
+name: RAYS Studio release builds
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "studio-v*"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            build_script: ./build-dmg.sh
+            artifact_glob: "Electron_app/RAYS-Studio/desktop/release/*.dmg"
+          - os: ubuntu-latest
+            build_script: ./build-linux.sh
+            artifact_glob: "Electron_app/RAYS-Studio/desktop/release/*"
+          - os: windows-latest
+            build_script: powershell -ExecutionPolicy Bypass -File ./build-windows.ps1
+            artifact_glob: "Electron_app/RAYS-Studio/desktop/release/*"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Linux build deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2 rpm
+
+      - name: Build RAYS Studio
+        working-directory: Electron_app/RAYS-Studio
+        run: |
+          chmod +x build-dmg.sh build-linux.sh desktop/scripts/bundle-backend.sh
+          ${{ matrix.build_script }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rays-studio-${{ matrix.os }}
+          path: ${{ matrix.artifact_glob }}
+          if-no-files-found: error

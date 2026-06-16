@@ -20,9 +20,9 @@ env/
 *.pem
 *.key
 
-# Build artifacts
-dist/
-build/
+# Build artifacts (repo root — do not use bare `build/`; it hides Electron icon assets)
+/dist/
+/build/
 *.egg-info/
 
 # Tooling
@@ -36,3 +36,24 @@ coverage.xml
 .DS_Store
 .idea/
 .vscode/
+
+# Conversation / dev history notes (do not publish)
+HISTORY.md
+History.md
+*History*.md
+**/HISTORY.md
+**/*History*.md
+
+# Electron GUI — ship source for build-from-source; exclude binaries and deps
+Electron_app/RAYS-CORE-GUI/
+Electron_app/**/node_modules/
+Electron_app/**/dist/
+Electron_app/**/release/
+Electron_app/**/*.dmg
+Electron_app/**/*.zip
+Electron_app/**/resources/backend/
+Electron_app/**/resources/backend-build/
+Electron_app/**/resources/bundle-venv/
+Electron_app/**/electron/install-epoch.json
+Electron_app/**/.DS_Store
+Electron_app/**/__pycache__/

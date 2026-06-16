@@ -1,0 +1,56 @@
+{
+  "name": "rays-studio-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RAYS Studio — Electron shell for the RAYS desktop GUI",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "concurrently -k \"npm run dev --prefix ../ui\" \"wait-on http://127.0.0.1:8080 && electron .\"",
+    "start": "electron .",
+    "build:studio": "npm run build --prefix ../ui && node ./scripts/fix-dist-html.js",
+    "bundle:backend": "bash ./scripts/bundle-backend.sh",
+    "dist": "npm run build:studio && npm run bundle:backend && electron-builder && node ./scripts/verify-packaged-ui.js",
+    "dist:mac": "npm run build:studio && npm run bundle:backend && electron-builder --mac dmg && node ./scripts/verify-packaged-ui.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "electron": "^35.0.0",
+    "electron-builder": "^25.1.8",
+    "wait-on": "^8.0.2"
+  },
+  "build": {
+    "appId": "com.rays.studio",
+    "productName": "RAYS Studio",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      {
+        "from": "../ui/dist",
+        "to": "ui/dist",
+        "filter": ["**/*"]
+      }
+    ],
+    "extraResources": [
+      {
+        "from": "resources/backend",
+        "to": "backend",
+        "filter": ["**/*"]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "icon": "build/icon.icns",
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "icon": "build/icon.png",
+      "target": ["nsis", "zip"]
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "target": ["AppImage", "deb"]
+    }
+  }
+}
