@@ -1,0 +1,121 @@
+# RAYS Studio — build validation on PRs and main (no GitHub Release).
+name: RAYS Studio CI
+
+on:
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "Electron_app/**"
+      - "src/rays_core/**"
+      - "pyproject.toml"
+      - ".github/workflows/studio-ci.yml"
+  push:
+    branches: [main, master]
+    paths:
+      - "Electron_app/**"
+      - "src/rays_core/**"
+      - "pyproject.toml"
+      - ".github/workflows/studio-ci.yml"
+
+concurrency:
+  group: studio-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # Fast gate on every PR: Ubuntu build only (~15–25 min).
+  build-linux-smoke:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Linux build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2 rpm
+
+      - name: Build RAYS Studio (Linux)
+        working-directory: Electron_app/RAYS-Studio
+        run: |
+          chmod +x build-linux.sh desktop/scripts/bundle-backend.sh
+          ./build-linux.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: studio-ci-linux-pr
+          path: Electron_app/RAYS-Studio/desktop/release/*
+          retention-days: 7
+
+  # Full matrix on merges to main (artifacts kept 14 days; not published as Release).
+  build-all:
+    if: github.event_name == 'push'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: macos
+            runs-on: macos-latest
+            script: ./build-dmg.sh
+          - id: ubuntu
+            runs-on: ubuntu-latest
+            script: ./build-linux.sh
+            apt: true
+          - id: windows
+            runs-on: windows-latest
+            script: powershell -ExecutionPolicy Bypass -File ./build-windows.ps1
+          - id: arch
+            runs-on: ubuntu-latest
+            script: ./build-arch.sh
+            container: archlinux:latest
+    runs-on: ${{ matrix.runs-on }}
+    container: ${{ matrix.container || null }}
+    timeout-minutes: 60
+    steps:
+      - name: Install Arch base packages
+        if: matrix.id == 'arch'
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm base-devel git nodejs npm python python-pip fuse2
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        if: matrix.id != 'arch'
+        with:
+          node-version: "20"
+
+      - uses: actions/setup-python@v5
+        if: matrix.id != 'arch'
+        with:
+          python-version: "3.12"
+
+      - name: Install Ubuntu deps
+        if: matrix.apt == true
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2 rpm
+
+      - name: Build RAYS Studio (${{ matrix.id }})
+        working-directory: Electron_app/RAYS-Studio
+        shell: bash
+        run: |
+          chmod +x build-dmg.sh build-linux.sh build-arch.sh desktop/scripts/bundle-backend.sh 2>/dev/null || true
+          ${{ matrix.script }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: studio-ci-${{ matrix.id }}
+          path: Electron_app/RAYS-Studio/desktop/release/*
+          retention-days: 14

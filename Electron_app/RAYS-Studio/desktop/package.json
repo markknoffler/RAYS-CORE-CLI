@@ -10,7 +10,9 @@
     "build:studio": "npm run build --prefix ../ui && node ./scripts/fix-dist-html.js",
     "bundle:backend": "bash ./scripts/bundle-backend.sh",
     "dist": "npm run build:studio && npm run bundle:backend && electron-builder && node ./scripts/verify-packaged-ui.js",
-    "dist:mac": "npm run build:studio && npm run bundle:backend && electron-builder --mac dmg && node ./scripts/verify-packaged-ui.js"
+    "dist:mac": "npm run build:studio && npm run bundle:backend && electron-builder --mac dmg && node ./scripts/verify-packaged-ui.js",
+    "dist:linux": "npm run build:studio && npm run bundle:backend && electron-builder --linux AppImage deb && node ./scripts/verify-packaged-ui.js",
+    "dist:win": "npm run build:studio && npm run bundle:backend && electron-builder --win nsis && node ./scripts/verify-packaged-ui.js"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",

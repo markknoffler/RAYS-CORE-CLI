@@ -1,0 +1,63 @@
+# Optional: maintainer bumps Studio version after a merged PR (label-gated).
+# Add label `release/studio` to a merged PR to open a version-bump PR.
+# Maintainers still review and merge that PR, then tag studio-vX.Y.Z to publish.
+name: RAYS Studio version bump (maintainer)
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main, master]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  propose-bump:
+    if: >
+      github.event.pull_request.merged == true &&
+      contains(github.event.pull_request.labels.*.name, 'release/studio')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Determine semver bump from PR title
+        id: bump
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          if [[ "$TITLE" =~ BREAKING\ CHANGE ]] || [[ "$TITLE" =~ ^feat! ]] || [[ "$TITLE" =~ ^fix! ]]; then
+            echo "kind=major" >> "$GITHUB_OUTPUT"
+          elif [[ "$TITLE" =~ ^feat(\(|:) ]]; then
+            echo "kind=minor" >> "$GITHUB_OUTPUT"
+          else
+            echo "kind=patch" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Bump desktop/package.json
+        id: ver
+        working-directory: Electron_app/RAYS-Studio/desktop
+        run: |
+          npm version ${{ steps.bump.outputs.kind }} --no-git-tag-version
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Open version bump PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore(studio): bump to v${{ steps.ver.outputs.version }}"
+          title: "chore(studio): bump RAYS Studio to v${{ steps.ver.outputs.version }}"
+          body: |
+            Automated version bump after merged PR #${{ github.event.pull_request.number }}.
+
+            **Maintainer checklist after merging this PR:**
+            1. `git pull origin main`
+            2. `git tag studio-v${{ steps.ver.outputs.version }}`
+            3. `git push origin studio-v${{ steps.ver.outputs.version }}`
+            4. Wait for **RAYS Studio Release** workflow → GitHub Release with `.dmg`, `.exe`, `.AppImage`, `.deb`
+          branch: chore/studio-bump-${{ steps.ver.outputs.version }}
+          labels: release/studio
