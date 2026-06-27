@@ -58,6 +58,6 @@ jobs:
             1. `git pull origin main`
             2. `git tag studio-v${{ steps.ver.outputs.version }}`
             3. `git push origin studio-v${{ steps.ver.outputs.version }}`
-            4. Wait for **RAYS Studio Release** workflow → GitHub Release with `.dmg`, `.exe`, `.AppImage`, `.deb`
+            4. Wait for **RAYS Studio Release** workflow → GitHub Release with `.dmg`, `.exe`, `.AppImage`, `.deb`, Arch `.pkg.tar.zst`
           branch: chore/studio-bump-${{ steps.ver.outputs.version }}
           labels: release/studio

@@ -245,7 +245,15 @@ MIT License. See `LICENSE`.
 
 ## Publishing Notes (Maintainers)
 
-### Build package
+### CLI (PyPI) — tag `vX.Y.Z`
+
+See [`docs/PUBLISHING.md`](./docs/PUBLISHING.md). Pushing `v1.6.0` triggers **PyPI Release** (`.github/workflows/pypi-release.yml`).
+
+### RAYS Studio GUI — tag `studio-vX.Y.Z`
+
+Desktop installers (`.dmg`, `.exe`, `.deb`, `.AppImage`, Arch `.pkg.tar.zst`) are published to **[GitHub Releases](https://github.com/markknoffler/RAYS-CORE-CLI/releases)** via **RAYS Studio Release** (`.github/workflows/studio-release.yml`). See [`docs/STUDIO_RELEASES.md`](./docs/STUDIO_RELEASES.md).
+
+### Build CLI package locally
 
 ```bash
 python -m pip install --upgrade build twine

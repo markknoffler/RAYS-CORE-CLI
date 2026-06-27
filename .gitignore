@@ -36,6 +36,7 @@ coverage.xml
 .DS_Store
 .idea/
 .vscode/
+.cursor/
 
 # Conversation / dev history notes (do not publish)
 HISTORY.md

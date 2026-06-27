@@ -48,3 +48,23 @@ cd Electron_app/RAYS-Studio/desktop && npm install && npm run dev
 ## Fresh install
 
 Each DMG build stamps a unique install epoch. Reinstalling clears saved name, chats, sessions, and workspace list until you use the app again.
+
+## Releases
+
+GUI installers are published on [GitHub Releases](https://github.com/markknoffler/RAYS-CORE-CLI/releases) when a `studio-vX.Y.Z` tag is pushed. See [`docs/STUDIO_RELEASES.md`](../../docs/STUDIO_RELEASES.md).
+
+## Tests
+
+From repository root:
+
+```bash
+./scripts/test-studio.sh
+```
+
+Or separately:
+
+```bash
+python -m pip install -e ".[studio,dev]"
+python -m pytest tests/test_studio_bridge.py -q
+cd Electron_app/RAYS-Studio/ui && npm ci && npm test
+```

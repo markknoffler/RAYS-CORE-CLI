@@ -1,6 +1,8 @@
 # Publishing RAYS-CORE to PyPI
 
-Maintainer checklist for a new release. **Do not publish until tests pass on all CI platforms** (Linux, macOS, Windows).
+Maintainer checklist for a **CLI / terminal** release. **Do not publish until tests pass on all CI platforms** (Linux, macOS, Windows).
+
+> **RAYS Studio (GUI)** uses a separate tag and GitHub Releases — see [`STUDIO_RELEASES.md`](./STUDIO_RELEASES.md). CLI tags look like `v1.6.0`; Studio tags look like `studio-v1.0.0`.
 
 ## Pre-release
 
@@ -28,12 +30,16 @@ Maintainer checklist for a new release. **Do not publish until tests pass on all
    git add pyproject.toml setup.py CHANGELOG.md
    git commit -m "Release v1.6.0"
    git tag v1.6.0
-   git push origin main --tags
+   git push origin v1.6.0
    ```
 
-   Wait for GitHub Actions CI to finish green on all three OSes.
+   Wait for the **PyPI Release** workflow (`.github/workflows/pypi-release.yml`) to verify tests on all three OSes and upload to PyPI.
 
-## Publish to PyPI
+   Repository secret required: `PYPI_API_TOKEN` (PyPI API token with upload scope).
+
+## Publish to PyPI (manual fallback)
+
+If you prefer a manual upload instead of the GitHub Action:
 
 PyPI credentials: API token via `TWINE_USERNAME=__token__` and `TWINE_PASSWORD=<pypi-token>`, or `~/.pypirc`.
 

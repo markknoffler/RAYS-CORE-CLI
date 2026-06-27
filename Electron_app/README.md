@@ -12,9 +12,14 @@ Desktop GUI for RAYS-CORE. **Source lives here** so anyone can build from GitHub
 |----------|-----------------------------------------------|
 | macOS | `chmod +x build-dmg.sh && ./build-dmg.sh` |
 | Linux (Ubuntu) | `chmod +x build-linux.sh && ./build-linux.sh` |
+| Arch Linux | `chmod +x build-arch.sh && ./build-arch.sh` |
 | Windows | `powershell -ExecutionPolicy Bypass -File build-windows.ps1` |
 
 PyInstaller backend binaries are **platform-specific** — build on the target OS (or use GitHub Actions workflow `.github/workflows/studio-release.yml`).
+
+## Releases (GUI)
+
+Installers are published on **[GitHub Releases](https://github.com/markknoffler/RAYS-CORE-CLI/releases)** when you push a `studio-vX.Y.Z` tag. See [`docs/STUDIO_RELEASES.md`](../docs/STUDIO_RELEASES.md).
 
 ## Build from source (macOS DMG)
 

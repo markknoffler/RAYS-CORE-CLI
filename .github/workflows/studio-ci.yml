@@ -1,4 +1,5 @@
 # RAYS Studio — build validation on PRs and main (no GitHub Release).
+# Full installer matrix runs on main pushes; PRs run fast tests + Linux smoke build.
 name: RAYS Studio CI
 
 on:
@@ -7,15 +8,19 @@ on:
     paths:
       - "Electron_app/**"
       - "src/rays_core/**"
+      - "tests/test_studio_bridge.py"
       - "pyproject.toml"
       - ".github/workflows/studio-ci.yml"
+      - ".github/workflows/studio-release.yml"
   push:
     branches: [main, master]
     paths:
       - "Electron_app/**"
       - "src/rays_core/**"
+      - "tests/test_studio_bridge.py"
       - "pyproject.toml"
       - ".github/workflows/studio-ci.yml"
+      - ".github/workflows/studio-release.yml"
 
 concurrency:
   group: studio-ci-${{ github.ref }}
@@ -25,8 +30,36 @@ permissions:
   contents: read
 
 jobs:
+  studio-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Python deps (studio)
+        run: python -m pip install -e ".[studio,dev]"
+
+      - name: Run GUI bridge tests (pytest)
+        run: python -m pytest tests/test_studio_bridge.py -q
+
+      - name: Run GUI UI tests (vitest)
+        working-directory: Electron_app/RAYS-Studio/ui
+        run: |
+          npm ci
+          npm test
+
   # Fast gate on every PR: Ubuntu build only (~15–25 min).
   build-linux-smoke:
+    needs: studio-tests
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -40,14 +73,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
 
       - name: Install Linux build deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y libfuse2 rpm
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            libfuse2 rpm libgtk-3-0 libnotify4 libnss3 libxss1 libxtst6 \
+            xdg-utils libatspi2.0-0 libuuid1
 
       - name: Build RAYS Studio (Linux)
         working-directory: Electron_app/RAYS-Studio
+        env:
+          RAYS_VERIFY_PLATFORM: linux
         run: |
           chmod +x build-linux.sh desktop/scripts/bundle-backend.sh
           ./build-linux.sh
@@ -60,6 +98,7 @@ jobs:
 
   # Full matrix on merges to main (artifacts kept 14 days; not published as Release).
   build-all:
+    needs: studio-tests
     if: github.event_name == 'push'
     strategy:
       fail-fast: false
@@ -67,29 +106,34 @@ jobs:
         include:
           - id: macos
             runs-on: macos-latest
-            script: ./build-dmg.sh
+            build_script: ./build-dmg.sh
+            verify_platform: mac
           - id: ubuntu
             runs-on: ubuntu-latest
-            script: ./build-linux.sh
+            build_script: ./build-linux.sh
+            verify_platform: linux
             apt: true
           - id: windows
             runs-on: windows-latest
-            script: powershell -ExecutionPolicy Bypass -File ./build-windows.ps1
+            build_script: powershell -ExecutionPolicy Bypass -File ./build-windows.ps1
+            verify_platform: win
           - id: arch
             runs-on: ubuntu-latest
-            script: ./build-arch.sh
+            build_script: ./build-arch.sh
+            verify_platform: linux
             container: archlinux:latest
     runs-on: ${{ matrix.runs-on }}
     container: ${{ matrix.container || null }}
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
-      - name: Install Arch base packages
+      - uses: actions/checkout@v4
+
+      - name: Install Arch build deps
         if: matrix.id == 'arch'
         run: |
           pacman -Syu --noconfirm
-          pacman -S --noconfirm base-devel git nodejs npm python python-pip fuse2
-
-      - uses: actions/checkout@v4
+          pacman -S --noconfirm base-devel git nodejs npm python python-pip fuse2 \
+            gtk3 libxss alsa-lib nss
 
       - uses: actions/setup-node@v4
         if: matrix.id != 'arch'
@@ -100,19 +144,24 @@ jobs:
         if: matrix.id != 'arch'
         with:
           python-version: "3.12"
+          cache: pip
 
-      - name: Install Ubuntu deps
+      - name: Install Ubuntu build deps
         if: matrix.apt == true
         run: |
           sudo apt-get update
-          sudo apt-get install -y libfuse2 rpm
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            libfuse2 rpm libgtk-3-0 libnotify4 libnss3 libxss1 libxtst6 \
+            xdg-utils libatspi2.0-0 libuuid1
 
       - name: Build RAYS Studio (${{ matrix.id }})
         working-directory: Electron_app/RAYS-Studio
         shell: bash
+        env:
+          RAYS_VERIFY_PLATFORM: ${{ matrix.verify_platform }}
         run: |
           chmod +x build-dmg.sh build-linux.sh build-arch.sh desktop/scripts/bundle-backend.sh 2>/dev/null || true
-          ${{ matrix.script }}
+          ${{ matrix.build_script }}
 
       - uses: actions/upload-artifact@v4
         with:
